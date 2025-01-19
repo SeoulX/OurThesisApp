@@ -8,12 +8,70 @@
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/welcomeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:fontFamily="@font/lato_black"
+        android:text="Welcome!"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.16"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.057" />
+
+    <TextView
+        android:id="@+id/disclaimerText"
+        android:layout_width="327dp"
+        android:layout_height="129dp"
+        android:layout_marginTop="1dp"
+        android:fontFamily="@font/lato_regular"
+        android:justificationMode="inter_word"
+        android:text="     This app is designed to gather data as part of our thesis research. The data collected will be used to analyze various emotional patterns and behaviors to contribute valuable insights to the field of computer science. "
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/welcomeText"
+        app:layout_constraintVertical_bias="0.043" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/neutralBtn"
+        android:layout_width="300dp"
+        android:layout_height="69dp"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:text="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/disclaimerText" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/frustrateBtn"
+        android:layout_width="300dp"
+        android:layout_height="69dp"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:text="2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/neutralBtn" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/anxietyBtn"
+        android:layout_width="300dp"
+        android:layout_height="69dp"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:text="3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frustrateBtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
