@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">OurThesisApp</string>
+    <string name="disclaimer_text">All the information that will be collected through this form shall be considered private and treated with utmost confidentiality.</string>
+    <string name="agreement">I consent to data use for this thesis (RA 10173).</string>
 </resources>

@@ -24,57 +24,120 @@
     <TextView
         android:id="@+id/disclaimerText"
         android:layout_width="327dp"
-        android:layout_height="129dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="1dp"
         android:fontFamily="@font/lato_regular"
         android:justificationMode="inter_word"
-        android:text="     This app is designed to gather data as part of our thesis research. The data collected will be used to analyze various emotional patterns and behaviors to contribute valuable insights to the field of computer science. "
+        android:text="@string/disclaimer_text"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/welcomeText"
-        app:layout_constraintVertical_bias="0.043" />
+        app:layout_constraintVertical_bias="0.038" />
+
+    <CheckBox
+        android:id="@+id/agree_checkBox"
+        android:layout_width="331dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/lato_regular"
+        android:text="@string/agreement"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/disclaimerText" />
+
+    <LinearLayout
+        android:id="@+id/firstLinearLayout"
+        android:layout_width="327dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/plane_background"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:elevation="4dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.511"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/agree_checkBox">
+
+        <TextView
+            android:id="@+id/ageTxt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginBottom="10dp"
+            android:fontFamily="@font/lato_bold"
+            android:text="Age:"
+            android:textSize="18dp"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <EditText
+            android:id="@+id/ageInput"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:ems="10"
+            android:hint="Age"
+            android:inputType="number"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/genderTxt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginBottom="10dp"
+            android:fontFamily="@font/lato_bold"
+            android:text="Gender:"
+            android:textSize="18dp"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <RadioGroup
+            android:id="@+id/genderGroup"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/radioMale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Male" />
+
+            <RadioButton
+                android:id="@+id/radioFemale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Female" />
+
+            <RadioButton
+                android:id="@+id/radioOther"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Other" />
+        </RadioGroup>
+
+    </LinearLayout>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/neutralBtn"
         android:layout_width="300dp"
         android:layout_height="69dp"
-        android:layout_marginTop="32dp"
-        android:fontFamily="@font/lato_bold"
+        android:layout_marginBottom="32dp"
         android:background="@drawable/button_background"
-        android:textColor="#FFFFFF"
-        android:text="One"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/disclaimerText" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/frustrateBtn"
-        android:layout_width="300dp"
-        android:layout_height="69dp"
-        android:layout_marginTop="32dp"
         android:fontFamily="@font/lato_bold"
-        android:background="@drawable/button_background"
+        android:text="Proceed"
+        android:visibility="invisible"
         android:textColor="#FFFFFF"
-        android:text="Two"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.503"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/neutralBtn" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/anxietyBtn"
-        android:layout_width="300dp"
-        android:layout_height="69dp"
-        android:layout_marginTop="32dp"
-        android:fontFamily="@font/lato_bold"
-        android:background="@drawable/button_background"
-        android:textColor="#FFFFFF"
-        android:text="Three"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.503"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frustrateBtn" />
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
