@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "429607792780",
+    "project_id": "ourthesis-172fa",
+    "storage_bucket": "ourthesis-172fa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:429607792780:android:687288dfc5da90ae5b4ba9",
+        "android_client_info": {
+          "package_name": "com.example.ourthesisapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmrKCFNCnkolkj_aUd3B5jtrI2ZtPgd0o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

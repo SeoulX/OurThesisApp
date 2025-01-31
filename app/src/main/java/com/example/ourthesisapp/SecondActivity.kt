@@ -1,5 +1,6 @@
 package com.example.ourthesisapp
 
+import android.content.Intent
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -9,15 +10,24 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.KeyEvent
+import android.view.View
+import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.database.FirebaseDatabase
 import kotlin.math.sqrt
 
-class SecondActivity : AppCompatActivity(), SensorEventListener {
+class SecondActivity : AppCompatActivity(), SensorEventListener{
+
+    private var sessionId: String? = null
+
+    private var focusedEditText: EditText? = null
+    private var questionCount = 0
+
     private lateinit var sensorManager: SensorManager
     private var accelerometer: Sensor? = null
     private var gyroscope: Sensor? = null
@@ -32,113 +42,96 @@ class SecondActivity : AppCompatActivity(), SensorEventListener {
     private var timerStarted = false
     private var startTime: Long = 0
     private var lastKeyPressTime: Long? = null
-    private val intertapDurations = mutableListOf<Long>()
-    private val deletionLengths = mutableListOf<Int>()
-    private val backspaceDurations = mutableListOf<Long>()
 
-    private val editTextMetrics = mutableMapOf<EditText, TextInputMetrics>()  // To store per EditText metrics
+    private var totalKeypresses = 0
+    private var backspaceCount = 0
+    private var totalCharactersErased = 0
+    private var deletionEvents = 0
+    private var intertapDurations = mutableListOf<Long>()
+    private var deletionLengths = mutableListOf<Int>()
+    private var backspaceDurations = mutableListOf<Long>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_second)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+    private val typingHandler = Handler(Looper.getMainLooper())
+
+    private val stopTypingRunnable = Runnable {
+        // Stop timer and record variables
+        val elapsedTime = (System.currentTimeMillis() - startTime) / 1000.0 // in seconds
+        val typedText = focusedEditText?.text.toString()
+        val wordsTyped = typedText.trim().split("\\s+".toRegex()).size
+
+        val typingSpeed = if (elapsedTime > 0) wordsTyped / (elapsedTime / 60) else 0.0
+        val backspaceRate = if (totalKeypresses > 0) backspaceCount.toDouble() / totalKeypresses else 0.0
+        val avgDeletionLength = if (deletionEvents > 0) totalCharactersErased.toDouble() / deletionEvents else 0.0
+        val avgIntertapDuration = if (intertapDurations.isNotEmpty()) intertapDurations.average() else 0.0
+        val intertapStdDev = if (intertapDurations.size > 1) {
+            val mean = intertapDurations.average()
+            Math.sqrt(intertapDurations.map { Math.pow((it - mean), 2.0) }.average())
+        } else 0.0
+
+        val questionData = mapOf(
+            "questionNumber" to questionCount,
+            "state" to "Neutral",
+            "typingSpeed_WPM" to typingSpeed,
+            "backspaceRate" to backspaceRate,
+            "avgDeletionLength" to avgDeletionLength,
+            "intertapDurations" to intertapDurations,
+            "avgIntertapDuration" to avgIntertapDuration,
+            "motion_typingEnergy" to typingEnergy,
+            "motion_abruptMovements" to getAbruptMovements(),
+            "motion_deviceStability" to getDeviceStability(),
+            "motion_rotationalVariability" to getRotationalVariability()
+        )
+
+        println("Motion Metrics:")
+        println("Typing Energy: $typingEnergy")
+        println("Abrupt Movements Detected: ${getAbruptMovements()}")
+        println("Device Stability: ${getDeviceStability()}")
+        println("Rotational Variability: ${getRotationalVariability()}")
+
+        // Raw Data for Typing Session
+        println("Raw Data for Typing Session:")
+        println("Backspace Frequency: $backspaceCount")
+        println("Backspace Rate: $backspaceRate")
+        println("Total Characters Erased: $totalCharactersErased")
+        println("Average Deletion Length: $avgDeletionLength")
+        println("Intertap Durations: $intertapDurations")
+        println("Average Intertap Duration: $avgIntertapDuration")
+        println("Intertap Duration Variability (Standard Deviation): $intertapStdDev")
+        println("Typing Speed (WPM): $typingSpeed")
+
+        val localSessionId = sessionId
+
+        if (localSessionId != null) {
+            val database = FirebaseDatabase.getInstance()
+            val sessionRef = database.getReference("sessions").child(localSessionId).child("questions")
+
+            val questionId = questionCount// Replace this with the actual ID of the question
+
+            sessionRef.child(questionId.toString()).setValue(questionData)
+                .addOnSuccessListener {
+                    println("Data saved for question $questionCount")
+                }
+                .addOnFailureListener {
+                    println("Failed to save data for question $questionCount")
+                }
         }
 
-        // Initialize sensors
-        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
-
-        val editText1 = findViewById<EditText>(R.id.sampleEdit)
-        val editText2 = findViewById<EditText>(R.id.sampleEdit2)
-
-        // Initializing metrics for each EditText
-        editTextMetrics[editText1] = TextInputMetrics()
-        editTextMetrics[editText2] = TextInputMetrics()
-
-        val typingHandler = Handler(Looper.getMainLooper())
-
-        val stopTypingRunnable = Runnable {
-            // Stop timer and record variables for the selected EditText
-            val activeEditText = getActiveEditText() ?: return@Runnable
-            val metrics = editTextMetrics[activeEditText] ?: return@Runnable
-
-            // Logic to process metrics for active EditText
-            val elapsedTime = (System.currentTimeMillis() - metrics.startTime) / 1000.0 // in seconds
-            val typedText = activeEditText.text.toString()
-            val wordsTyped = typedText.trim().split("\\s+".toRegex()).size
-
-            val typingSpeed = if (elapsedTime > 0) wordsTyped / (elapsedTime / 60) else 0.0
-            val backspaceRate = if (metrics.totalKeypresses > 0) metrics.backspaceCount.toDouble() / metrics.totalKeypresses else 0.0
-            val avgDeletionLength = if (metrics.deletionEvents > 0) metrics.totalCharactersErased.toDouble() / metrics.deletionEvents else 0.0
-            val avgIntertapDuration = if (metrics.intertapDurations.isNotEmpty()) metrics.intertapDurations.average() else 0.0
-            val intertapStdDev = if (metrics.intertapDurations.size > 1) {
-                val mean = metrics.intertapDurations.average()
-                Math.sqrt(metrics.intertapDurations.map { Math.pow((it - mean), 2.0) }.average())
-            } else 0.0
-
-            // Motion Metrics
-            println("Motion Metrics:")
-            println("Typing Energy: $typingEnergy")
-            println("Abrupt Movements Detected: $backspaceDurations")
-            println("Device Stability: ${getDeviceStability()}")
-            println("Rotational Variability: ${getRotationalVariability()}")
-
-            // Raw Data for Typing Session
-            println("Raw Data for Typing Session:")
-            println("Backspace Frequency: ${metrics.backspaceCount}")
-            println("Backspace Rate: $backspaceRate")
-            println("Length of Individual Deletions: ${metrics.deletionLengths}")
-            println("Total Characters Erased: ${metrics.totalCharactersErased}")
-            println("Deletion Events: ${metrics.deletionEvents}")
-            println("Average Deletion Length: $avgDeletionLength")
-            println("Intertap Durations: ${metrics.intertapDurations}")
-            println("Average Intertap Duration: $avgIntertapDuration")
-            println("Intertap Duration Variability (Standard Deviation): $intertapStdDev")
-            println("Typing Speed (WPM): $typingSpeed")
-
-            // Reset variables for the next session
-            resetMetrics()
-        }
-
-        // Add listeners for each EditText
-        setupEditTextListeners(editText1, typingHandler, stopTypingRunnable)
-        setupEditTextListeners(editText2, typingHandler, stopTypingRunnable)
+        // Reset variables for the next session
+        resetMetrics()
     }
 
-    // Helper function to retrieve active EditText
-    private fun getActiveEditText(): EditText? {
-        // You could set this manually or based on focus, for example:
-        val currentFocus = currentFocus
-        return if (currentFocus is EditText) currentFocus else null
-    }
-
-    // Function to setup EditText listeners
-    private fun setupEditTextListeners(editText: EditText, typingHandler: Handler, stopTypingRunnable: Runnable) {
-        var totalKeypresses = 0
-        var backspaceCount = 0
-        var totalCharactersErased = 0
-        var deletionEvents = 0
-
-        val metrics = editTextMetrics[editText] ?: return
-
+    private fun focusChangeListener(editText: EditText) {
         editText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                println("${ resources.getResourceEntryName(editText.id)}, starting timer...")
-                metrics.timerStarted = true
-                metrics.startTime = System.currentTimeMillis()
-            } else {
-                if (metrics.timerStarted) {
-                    typingHandler.removeCallbacks(stopTypingRunnable)
-                    stopTypingRunnable.run()
-                }
+                resetMetrics()
+                timerStarted = true
+                startTime = System.currentTimeMillis()
+                focusedEditText = editText
+                lastKeyPressTime = null
             }
         }
-
+    }
+    private fun setupTextWatcher(editText: EditText) {
         editText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 if (count > after) {
@@ -146,34 +139,33 @@ class SecondActivity : AppCompatActivity(), SensorEventListener {
                     backspaceCount++
                     totalCharactersErased += count - after
                     deletionEvents++
-                    metrics.deletionLengths.add(count - after)  // Record the length of each deletion
+                    deletionLengths.add(count - after) // Record the length of each deletion
                     val currentTime = System.currentTimeMillis()
-                    if (metrics.lastKeyPressTime != null) {
-                        metrics.backspaceDurations.add(currentTime - metrics.lastKeyPressTime!!)  // Track time between backspaces
+                    if (lastKeyPressTime != null) {
+                        backspaceDurations.add(currentTime - lastKeyPressTime!!) // Track time between backspaces
                     }
                 }
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (!metrics.timerStarted) {
-                    metrics.timerStarted = true
-                    metrics.startTime = System.currentTimeMillis()
+                if (!timerStarted) {
+                    timerStarted = true
+                    startTime = System.currentTimeMillis()
                 }
                 totalKeypresses++
 
+                if (s.toString().endsWith("\n")) {
+                    return
+                }
                 val currentTime = System.currentTimeMillis()
 
-                // Only record intertap duration if there was a previous keypress time
-                metrics.lastKeyPressTime?.let {
+                // Record intertap durations
+                lastKeyPressTime?.let {
                     val intertapDuration = currentTime - it
-                    metrics.intertapDurations.add(intertapDuration) // Store the intertap duration
+                    intertapDurations.add(intertapDuration) // Store the intertap duration
                 }
 
-                metrics.lastKeyPressTime = currentTime // Update the timestamp for the current keypress
-
-                // Reset the "stop typing" timer
-                typingHandler.removeCallbacks(stopTypingRunnable)
-                typingHandler.postDelayed(stopTypingRunnable, 2000) // Wait 2 seconds of inactivity
+                lastKeyPressTime = currentTime // Update the timestamp for the current keypress
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -181,6 +173,133 @@ class SecondActivity : AppCompatActivity(), SensorEventListener {
             }
         })
     }
+
+    private fun setupButtonClick(editText: EditText, button: Button, currentLayout: LinearLayout, nextLayout: LinearLayout) {
+        button.setOnClickListener {
+
+            // Check if EditText is empty
+            if (editText.text.toString().trim().isEmpty()) {
+                // Show an error message or prevent submission
+                editText.error = "This field cannot be empty"
+                return@setOnClickListener // Exit without submitting
+            }
+
+            // If content is not empty, continue as before
+            typingHandler.removeCallbacks(stopTypingRunnable) // Cancel any pending task
+            stopTypingRunnable.run()
+            println("Captured data for layout: ${currentLayout.id}")
+
+            currentLayout.visibility = View.GONE
+            nextLayout.visibility = View.VISIBLE
+
+            questionCount++
+        }
+    }
+
+    private fun setupButtonClickLast(editText: EditText, button: Button, currentLayout: LinearLayout) {
+        button.setOnClickListener {
+            if (editText.text.toString().trim().isEmpty()) {
+                // Show an error message or prevent submission
+                editText.error = "This field cannot be empty"
+                return@setOnClickListener // Exit without submitting
+            }
+
+            typingHandler.removeCallbacks(stopTypingRunnable) // Cancel any pending task
+            stopTypingRunnable.run()
+            println("Captured data for layout: ${currentLayout.id}")
+
+            currentLayout.visibility = View.GONE
+
+            questionCount++
+
+            if (questionCount == 10) {
+                navigateToNextActivity()
+            }
+        }
+    }
+
+    private fun navigateToNextActivity() {
+        val intent = Intent(this, ThirdActivity::class.java)
+        val age = intent.getIntExtra("Age", -1)  // Default value is -1 in case the extra is not found
+        val gender = intent.getStringExtra("Gender")
+        intent.putExtra("Age", age)
+        intent.putExtra("Gender", gender)
+        print("$age, $gender")
+        startActivity(intent)
+        finish()
+    }
+
+    private fun initializeEditTextListeners() {
+        println("$sessionId is the SessionID")
+
+        val editText0 = findViewById<EditText>(R.id.a0)
+        val editText1 = findViewById<EditText>(R.id.a1)
+        val editText2 = findViewById<EditText>(R.id.a2)
+        val editText3 = findViewById<EditText>(R.id.a3)
+        val editText4 = findViewById<EditText>(R.id.a4)
+        val editText5 = findViewById<EditText>(R.id.a5)
+        val editText6 = findViewById<EditText>(R.id.a6)
+        val editText7 = findViewById<EditText>(R.id.a7)
+        val editText8 = findViewById<EditText>(R.id.a8)
+        val editText9 = findViewById<EditText>(R.id.a9)
+
+        val submit0 = findViewById<Button>(R.id.submit_a0)
+        val submit1 = findViewById<Button>(R.id.submit_a1)
+        val submit2 = findViewById<Button>(R.id.submit_a2)
+        val submit3 = findViewById<Button>(R.id.submit_a3)
+        val submit4 = findViewById<Button>(R.id.submit_a4)
+        val submit5 = findViewById<Button>(R.id.submit_a5)
+        val submit6 = findViewById<Button>(R.id.submit_a6)
+        val submit7 = findViewById<Button>(R.id.submit_a7)
+        val submit8 = findViewById<Button>(R.id.submit_a8)
+        val submit9 = findViewById<Button>(R.id.submit_a9)
+
+        val layout0 = findViewById<LinearLayout>(R.id.linearLayout0)
+        val layout1 = findViewById<LinearLayout>(R.id.linearLayout1)
+        val layout2 = findViewById<LinearLayout>(R.id.linearLayout2)
+        val layout3 = findViewById<LinearLayout>(R.id.linearLayout3)
+        val layout4 = findViewById<LinearLayout>(R.id.linearLayout4)
+        val layout5 = findViewById<LinearLayout>(R.id.linearLayout5)
+        val layout6 = findViewById<LinearLayout>(R.id.linearLayout6)
+        val layout7 = findViewById<LinearLayout>(R.id.linearLayout7)
+        val layout8 = findViewById<LinearLayout>(R.id.linearLayout8)
+        val layout9 = findViewById<LinearLayout>(R.id.linearLayout9)
+
+        focusChangeListener(editText0)
+        focusChangeListener(editText1)
+        focusChangeListener(editText2)
+        focusChangeListener(editText3)
+        focusChangeListener(editText4)
+        focusChangeListener(editText5)
+        focusChangeListener(editText6)
+        focusChangeListener(editText7)
+        focusChangeListener(editText8)
+        focusChangeListener(editText9)
+
+        setupTextWatcher(editText0)
+        setupTextWatcher(editText1)
+        setupTextWatcher(editText2)
+        setupTextWatcher(editText3)
+        setupTextWatcher(editText4)
+        setupTextWatcher(editText5)
+        setupTextWatcher(editText6)
+        setupTextWatcher(editText7)
+        setupTextWatcher(editText8)
+        setupTextWatcher(editText9)
+
+        setupButtonClick(editText0, submit0, layout0, layout1)
+        setupButtonClick(editText1, submit1, layout1, layout2)
+        setupButtonClick(editText2, submit2, layout2, layout3)
+        setupButtonClick(editText3, submit3, layout3, layout4)
+        setupButtonClick(editText4, submit4, layout4, layout5)
+        setupButtonClick(editText5, submit5, layout5, layout6)
+        setupButtonClick(editText6, submit6, layout6, layout7)
+        setupButtonClick(editText7, submit7, layout7, layout8)
+        setupButtonClick(editText8, submit8, layout8, layout9)
+        setupButtonClickLast(editText9, submit9, layout9)
+    }
+
+    //    // Function to calculate Typing Energy
     private fun calculateTypingEnergy(accelerometerValues: FloatArray, gyroscopeValues: FloatArray, deltaTime: Long) {
         val wx = gyroscopeValues[0]
         val wy = gyroscopeValues[1]
@@ -225,11 +344,17 @@ class SecondActivity : AppCompatActivity(), SensorEventListener {
 
     // Reset all variables
     private fun resetMetrics() {
+        totalKeypresses = 0
+        backspaceCount = 0
+        totalCharactersErased = 0
+        deletionEvents = 0
+        intertapDurations.clear()
+        deletionLengths.clear()
+        backspaceDurations.clear()
         typingEnergy = 0.0
         lastTime = System.currentTimeMillis()
         lastAccelerometerValues = FloatArray(3)
         lastGyroscopeValues = FloatArray(3)
-        // Reset other metrics
     }
 
     // Sensor Event Listener
@@ -264,17 +389,34 @@ class SecondActivity : AppCompatActivity(), SensorEventListener {
         sensorManager.unregisterListener(this)
     }
 
-    // TextInputMetrics class to store metrics for each EditText
-    data class TextInputMetrics(
-        var timerStarted: Boolean = false,
-        var startTime: Long = 0,
-        var totalKeypresses: Int = 0,
-        var backspaceCount: Int = 0,
-        var totalCharactersErased: Int = 0,
-        var deletionEvents: Int = 0,
-        var deletionLengths: MutableList<Int> = mutableListOf(),
-        var backspaceDurations: MutableList<Long> = mutableListOf(),
-        var intertapDurations: MutableList<Long> = mutableListOf(),
-        var lastKeyPressTime: Long? = null
-    )
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_second)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
+        val layouts = listOf(
+            findViewById<LinearLayout>(R.id.linearLayout1),
+            findViewById<LinearLayout>(R.id.linearLayout2),
+            findViewById<LinearLayout>(R.id.linearLayout3),
+            findViewById<LinearLayout>(R.id.linearLayout4),
+            findViewById<LinearLayout>(R.id.linearLayout5),
+            findViewById<LinearLayout>(R.id.linearLayout6),
+            findViewById<LinearLayout>(R.id.linearLayout7),
+            findViewById<LinearLayout>(R.id.linearLayout8),
+            findViewById<LinearLayout>(R.id.linearLayout9),
+        )
+
+        layouts.forEach { it.visibility = View.GONE }
+        sessionId = intent.getStringExtra("SessionID")
+        initializeEditTextListeners()
+
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+    }
 }

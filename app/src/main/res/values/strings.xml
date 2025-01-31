@@ -2,4 +2,22 @@
     <string name="app_name">OurThesisApp</string>
     <string name="disclaimer_text">All the information that will be collected through this form shall be considered private and treated with utmost confidentiality.</string>
     <string name="agreement">I consent to data use for this thesis (RA 10173).</string>
+    <string name="nextBtn">Next</string>
+
+    <string name="sc1">Scenario 1: You just finished eating, and you don’t feel particularly full or hungry.</string>
+    <string name="sc2">Question: How would you describe your feeling in this situation?</string>
+    <string name="sc3">Scenario 2: You’re waiting for a friend to arrive, and you have no strong feelings about the wait.</string>
+    <string name="sc4">Question: What do you think or feel in this scenario?</string>
+    <string name="sc5">Scenario 3: You receive an email from a coworker confirming an upcoming meeting.</string>
+    <string name="sc6">Question: How do you respond to this situation?</string>
+    <string name="sc7">Scenario 4: You are sitting in a café, looking around, but nothing particularly stands out.</string>
+    <string name="sc8">Question: How would you describe your emotional state right now?</string>
+    <string name="sc9">Scenario 5: You hear a neutral fact, like "Today is Monday," without any emotional impact.</string>
+    <string name="sc10">Question: How do you react or feel when hearing such a statement?</string>
+
+    <string name="q1">What does the word "neutral" mean to you when it comes to emotions?</string>
+    <string name="q2">Think of a moment in the past week when you felt emotionally neutral. Please describe that moment.</string>
+    <string name="q3">What words or phrases would you use to describe a neutral feeling?</string>
+    <string name="q4">If you had to type out a response to someone asking, "How are you?", and you were feeling neutral, what would you say?</string>
+    <string name="q5">Imagine you are watching a video of a person with no emotional expression. What would you type to describe their expression?</string>
 </resources>

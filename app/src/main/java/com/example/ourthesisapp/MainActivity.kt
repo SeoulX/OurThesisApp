@@ -15,6 +15,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.database.FirebaseDatabase
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,6 +31,12 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        val database = FirebaseDatabase.getInstance()
+        val usersRef = database.getReference("sessions")
+
+        neutralButton = findViewById(R.id.neutralBtn)
+
         val agreementCheck: CheckBox = findViewById(R.id.agree_checkBox)
         val linearLayout: LinearLayout = findViewById(R.id.firstLinearLayout)
 
@@ -36,13 +44,9 @@ class MainActivity : AppCompatActivity() {
             if (isChecked) {
                 fadeIn(linearLayout)
                 fadeIn(neutralButton)
-//                linearLayout.visibility = View.VISIBLE
-//                neutralButton.visibility = View.VISIBLE
             } else {
                 fadeOut(linearLayout)
                 fadeOut(neutralButton)
-//                linearLayout.visibility = View.INVISIBLE
-//                neutralButton.visibility = View.INVISIBLE
             }
         }
 
@@ -64,8 +68,27 @@ class MainActivity : AppCompatActivity() {
                     else -> ""
                 }
 
+                val sessionId = usersRef.push().key
+
+                if (sessionId != null) {
+                    val userData = mapOf(
+                        "age" to age,
+                        "gender" to gender
+                    )
+
+                    // Save data to Firebase
+                    usersRef.child(sessionId).setValue(userData)
+                        .addOnSuccessListener {
+                            Toast.makeText(this, "Data saved successfully!", Toast.LENGTH_SHORT).show()
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(this, "Failed to save data", Toast.LENGTH_SHORT).show()
+                        }
+                }
+
                 // Pass the data to the next activity
                 val intent = Intent(this, SecondActivity::class.java)
+                intent.putExtra("SessionID", sessionId)
                 intent.putExtra("Age", age)
                 intent.putExtra("Gender", gender)
                 startActivity(intent)
