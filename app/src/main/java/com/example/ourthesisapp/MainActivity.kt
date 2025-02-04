@@ -89,8 +89,6 @@ class MainActivity : AppCompatActivity() {
                 // Pass the data to the next activity
                 val intent = Intent(this, SecondActivity::class.java)
                 intent.putExtra("SessionID", sessionId)
-                intent.putExtra("Age", age)
-                intent.putExtra("Gender", gender)
                 startActivity(intent)
             }
         }

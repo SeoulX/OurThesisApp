@@ -25,7 +25,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.database.FirebaseDatabase
 import kotlin.math.sqrt
 
-class ThirdActivity : AppCompatActivity(), SensorEventListener{
+class ForthActivity : AppCompatActivity(), SensorEventListener{
 
     private var sessionId: String? = null
     private var questions: Array<String>? = null
@@ -88,7 +88,7 @@ class ThirdActivity : AppCompatActivity(), SensorEventListener{
             "motion_deviceStability" to getDeviceStability(),
             "motion_rotationalVariability" to getRotationalVariability(),
             "text" to focusedEditText!!.text.toString(),
-            "state" to "Frustration",
+            "state" to "Anxiety",
             "rate" to emotionRate,
         )
 
@@ -114,7 +114,7 @@ class ThirdActivity : AppCompatActivity(), SensorEventListener{
 
         if (localSessionId != null) {
             val database = FirebaseDatabase.getInstance()
-            val sessionRef = database.getReference("sessions").child(localSessionId).child("questions").child("level2")
+            val sessionRef = database.getReference("sessions").child(localSessionId).child("questions").child("level3")
 
             val questionId = questionCount// Replace this with the actual ID of the question
 
@@ -271,9 +271,6 @@ class ThirdActivity : AppCompatActivity(), SensorEventListener{
     }
 
     private fun navigateToNextActivity() {
-        val intent = Intent(this, ForthActivity::class.java)
-        intent.putExtra("SessionID", sessionId)
-        startActivity(intent)
         finish()
     }
 
@@ -440,7 +437,7 @@ class ThirdActivity : AppCompatActivity(), SensorEventListener{
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_third)
+        setContentView(R.layout.activity_forth)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)

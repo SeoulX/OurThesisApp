@@ -54,23 +54,24 @@ class SecondActivity : AppCompatActivity(), SensorEventListener{
     private val typingHandler = Handler(Looper.getMainLooper())
 
     private val stopTypingRunnable = Runnable {
-        // Stop timer and record variables
-        val elapsedTime = (System.currentTimeMillis() - startTime) / 1000.0 // in seconds
+
+        val elapsedTime = (System.currentTimeMillis() - startTime) / 1000.0
         val typedText = focusedEditText?.text.toString()
         val wordsTyped = typedText.trim().split("\\s+".toRegex()).size
 
-        val typingSpeed = if (elapsedTime > 0) wordsTyped / (elapsedTime / 60) else 0.0
+        val elapsedTimeInMinutes = (elapsedTime) / 60.0
+        val typingSpeed = if (elapsedTimeInMinutes > 0) wordsTyped / elapsedTimeInMinutes else 0.0
+
         val backspaceRate = if (totalKeypresses > 0) backspaceCount.toDouble() / totalKeypresses else 0.0
         val avgDeletionLength = if (deletionEvents > 0) totalCharactersErased.toDouble() / deletionEvents else 0.0
         val avgIntertapDuration = if (intertapDurations.isNotEmpty()) intertapDurations.average() else 0.0
         val intertapStdDev = if (intertapDurations.size > 1) {
             val mean = intertapDurations.average()
-            Math.sqrt(intertapDurations.map { Math.pow((it - mean), 2.0) }.average())
+            Math.sqrt(intertapDurations.map { Math.pow((it - mean), 2.0) }.sum() / (intertapDurations.size - 1))
         } else 0.0
 
         val questionData = mapOf(
             "questionNumber" to questionCount,
-            "state" to "Neutral",
             "typingSpeed_WPM" to typingSpeed,
             "backspaceRate" to backspaceRate,
             "avgDeletionLength" to avgDeletionLength,
@@ -79,7 +80,10 @@ class SecondActivity : AppCompatActivity(), SensorEventListener{
             "motion_typingEnergy" to typingEnergy,
             "motion_abruptMovements" to getAbruptMovements(),
             "motion_deviceStability" to getDeviceStability(),
-            "motion_rotationalVariability" to getRotationalVariability()
+            "motion_rotationalVariability" to getRotationalVariability(),
+            "text" to focusedEditText!!.text.toString(),
+            "state" to "Neutral",
+            "rate" to "Neutral"
         )
 
         println("Motion Metrics:")
@@ -103,7 +107,7 @@ class SecondActivity : AppCompatActivity(), SensorEventListener{
 
         if (localSessionId != null) {
             val database = FirebaseDatabase.getInstance()
-            val sessionRef = database.getReference("sessions").child(localSessionId).child("questions")
+            val sessionRef = database.getReference("sessions").child(localSessionId).child("questions").child("level1")
 
             val questionId = questionCount// Replace this with the actual ID of the question
 
@@ -135,7 +139,6 @@ class SecondActivity : AppCompatActivity(), SensorEventListener{
         editText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 if (count > after) {
-                    // Backspace detected
                     backspaceCount++
                     totalCharactersErased += count - after
                     deletionEvents++
@@ -159,13 +162,12 @@ class SecondActivity : AppCompatActivity(), SensorEventListener{
                 }
                 val currentTime = System.currentTimeMillis()
 
-                // Record intertap durations
                 lastKeyPressTime?.let {
                     val intertapDuration = currentTime - it
-                    intertapDurations.add(intertapDuration) // Store the intertap duration
+                    intertapDurations.add(intertapDuration)
                 }
 
-                lastKeyPressTime = currentTime // Update the timestamp for the current keypress
+                lastKeyPressTime = currentTime
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -177,9 +179,7 @@ class SecondActivity : AppCompatActivity(), SensorEventListener{
     private fun setupButtonClick(editText: EditText, button: Button, currentLayout: LinearLayout, nextLayout: LinearLayout) {
         button.setOnClickListener {
 
-            // Check if EditText is empty
             if (editText.text.toString().trim().isEmpty()) {
-                // Show an error message or prevent submission
                 editText.error = "This field cannot be empty"
                 return@setOnClickListener // Exit without submitting
             }
@@ -220,11 +220,7 @@ class SecondActivity : AppCompatActivity(), SensorEventListener{
 
     private fun navigateToNextActivity() {
         val intent = Intent(this, ThirdActivity::class.java)
-        val age = intent.getIntExtra("Age", -1)  // Default value is -1 in case the extra is not found
-        val gender = intent.getStringExtra("Gender")
-        intent.putExtra("Age", age)
-        intent.putExtra("Gender", gender)
-        print("$age, $gender")
+        intent.putExtra("SessionID", sessionId)
         startActivity(intent)
         finish()
     }

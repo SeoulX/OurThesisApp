@@ -20,4 +20,11 @@
     <string name="q3">What words or phrases would you use to describe a neutral feeling?</string>
     <string name="q4">If you had to type out a response to someone asking, "How are you?", and you were feeling neutral, what would you say?</string>
     <string name="q5">Imagine you are watching a video of a person with no emotional expression. What would you type to describe their expression?</string>
+
+    <string name="rating">Did this video trigger any strong emotions? If so, which ones?</string>
+    <string name="f1">Did this video make you feel uncomfortable or irritated? Why or why not?</string>
+    <string name="f2">Describe your feelings while watching this video.</string>
+    <string name="f3">How did this video make you feel?</string>
+    <string name="f4">What thoughts ran through your mind while watching this?</string>
+    <string name="f5">Did this video annoy you? If so, what specifically triggered it?</string>
 </resources>
