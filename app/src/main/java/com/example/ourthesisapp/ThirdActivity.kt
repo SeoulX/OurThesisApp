@@ -271,9 +271,9 @@ class ThirdActivity : AppCompatActivity(), SensorEventListener{
     }
 
     private fun navigateToNextActivity() {
-        val intent = Intent(this, ForthActivity::class.java)
-        intent.putExtra("SessionID", sessionId)
-        startActivity(intent)
+//        val intent = Intent(this, ForthActivity::class.java)
+//        intent.putExtra("SessionID", sessionId)
+//        startActivity(intent)
         finish()
     }
 
