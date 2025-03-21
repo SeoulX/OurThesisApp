@@ -390,11 +390,6 @@ class SecondActivity : AppCompatActivity(), SensorEventListener{
             findViewById<LinearLayout>(R.id.linearLayout2),
             findViewById<LinearLayout>(R.id.linearLayout3),
             findViewById<LinearLayout>(R.id.linearLayout4),
-            findViewById<LinearLayout>(R.id.linearLayout5),
-            findViewById<LinearLayout>(R.id.linearLayout6),
-            findViewById<LinearLayout>(R.id.linearLayout7),
-            findViewById<LinearLayout>(R.id.linearLayout8),
-            findViewById<LinearLayout>(R.id.linearLayout9),
         )
 
         layouts.forEach { it.visibility = View.GONE }
