@@ -107,7 +107,7 @@ class SecondActivity : AppCompatActivity(), SensorEventListener{
 
         if (localSessionId != null) {
             val database = FirebaseDatabase.getInstance()
-            val sessionRef = database.getReference("sessions").child(localSessionId).child("questions").child("level1")
+            val sessionRef = database.getReference("sessions_anxie").child(localSessionId).child("questions").child("level1")
 
             val questionId = questionCount// Replace this with the actual ID of the question
 

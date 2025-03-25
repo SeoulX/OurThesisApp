@@ -22,9 +22,24 @@
     <string name="q5">Imagine you are watching a video of a person with no emotional expression. What would you type to describe their expression?</string>
 
     <string name="rating">Did this video trigger any strong emotions? If so, which ones?</string>
-    <string name="f1">Did this video make you feel uncomfortable or irritated? Why or why not?</string>
-    <string name="f2">Describe your feelings while watching this video.</string>
-    <string name="f3">How did this video make you feel?</string>
-    <string name="f4">What thoughts ran through your mind while watching this?</string>
-    <string name="f5">Did this video annoy you? If so, what specifically triggered it?</string>
+    <string name="f1">Did this video make you feel anxious or uneasy? Why or why not?</string>
+    <string name="f2">Describe your emotions while watching this video. Did you feel tense, nervous, or scared?</string>
+    <string name="f3">How did this video affect your anxiety levels?</string>
+    <string name="f4">What thoughts ran through your mind while watching this? Did you anticipate something bad happening?</string>
+    <string name="f5">Did this video make you feel on edge? If so, what specifically triggered that feeling?</string>
+    <string name="f6">Were there any specific moments in the video that made you feel the most anxious? Why?</string>
+    <string name="f7">Did you experience a sense of helplessness, dread, or fear while watching? What caused it?</string>
+    <string name="f8">Was there anything in the video that made you feel overwhelmed or panicked? If so, what?</string>
+    <string name="f9">Did the pacing, visuals, or sounds in the video contribute to your feelings of anxiety? How?</string>
+    <string name="f10">Did any part of the video make you want to look away or stop watching? If so, why?</string>
+    <string name="f11">Did the video create a sense that something bad or unpredictable was about to happen? What was it?</string>
+    <string name="f12">Were you expecting a different outcome or resolution? Did that uncertainty add to your anxiety?</string>
+    <string name="f13">Did this video remind you of a stressful or frightening personal experience? If so, what was it?</string>
+    <string name="f14">Did you feel trapped, powerless, or vulnerable while watching this video? Why?</string>
+    <string name="f15">Did this video leave you feeling anxious even after it ended? Why do you think that is?</string>
+    <string name="f16">Would you describe your anxiety as mild unease or intense fear? What made it that way?</string>
+    <string name="f17">Did you feel that the video was intentionally designed to provoke anxiety? Why or why not?</string>
+    <string name="f18">Did any specific character, sound, or event in the video make you feel particularly tense or afraid?</string>
+    <string name="f19">How did your anxiety change throughout the video—did it build up, stay constant, or fade away?</string>
+    <string name="f20">If you could express your anxiety in one sentence, what would you say?</string>
 </resources>

@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val database = FirebaseDatabase.getInstance()
-        val usersRef = database.getReference("sessions")
+        val usersRef = database.getReference("sessions_anxie")
 
         neutralButton = findViewById(R.id.neutralBtn)
 

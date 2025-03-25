@@ -88,7 +88,7 @@ class ThirdActivity : AppCompatActivity(), SensorEventListener{
             "motion_deviceStability" to getDeviceStability(),
             "motion_rotationalVariability" to getRotationalVariability(),
             "text" to focusedEditText!!.text.toString(),
-            "state" to "Frustration",
+            "state" to "Anxious",
             "rate" to emotionRate,
         )
 
@@ -114,7 +114,7 @@ class ThirdActivity : AppCompatActivity(), SensorEventListener{
 
         if (localSessionId != null) {
             val database = FirebaseDatabase.getInstance()
-            val sessionRef = database.getReference("sessions").child(localSessionId).child("questions").child("level2")
+            val sessionRef = database.getReference("sessions_anxie").child(localSessionId).child("questions").child("level2")
 
             val questionId = questionCount// Replace this with the actual ID of the question
 
@@ -218,7 +218,7 @@ class ThirdActivity : AppCompatActivity(), SensorEventListener{
             }
 
             // If content is not empty, continue as before
-            typingHandler.removeCallbacks(stopTypingRunnable) // Cancel any pending task
+            typingHandler.removeCallbacks(stopTypingRunnable)
             stopTypingRunnable.run()
             println("Captured data for layout: ${currentLayout.id}")
 
@@ -231,7 +231,22 @@ class ThirdActivity : AppCompatActivity(), SensorEventListener{
                 getString(R.string.f2),
                 getString(R.string.f3),
                 getString(R.string.f4),
-                getString(R.string.f5)
+                getString(R.string.f5),
+                getString(R.string.f6),
+                getString(R.string.f7),
+                getString(R.string.f8),
+                getString(R.string.f9),
+                getString(R.string.f10),
+                getString(R.string.f11),
+                getString(R.string.f12),
+                getString(R.string.f13),
+                getString(R.string.f14),
+                getString(R.string.f15),
+                getString(R.string.f16),
+                getString(R.string.f17),
+                getString(R.string.f18),
+                getString(R.string.f19),
+                getString(R.string.f20),
             )
 
             val textViewIds = listOf(
@@ -467,7 +482,22 @@ class ThirdActivity : AppCompatActivity(), SensorEventListener{
             getString(R.string.f2),
             getString(R.string.f3),
             getString(R.string.f4),
-            getString(R.string.f5)
+            getString(R.string.f5),
+            getString(R.string.f6),
+            getString(R.string.f7),
+            getString(R.string.f8),
+            getString(R.string.f9),
+            getString(R.string.f10),
+            getString(R.string.f11),
+            getString(R.string.f12),
+            getString(R.string.f13),
+            getString(R.string.f14),
+            getString(R.string.f15),
+            getString(R.string.f16),
+            getString(R.string.f17),
+            getString(R.string.f18),
+            getString(R.string.f19),
+            getString(R.string.f20),
         )
 
         val textViewIds = listOf(
